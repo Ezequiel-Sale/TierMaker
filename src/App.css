@@ -111,10 +111,15 @@ body {
 #selector-items {
   border: 1px solid #666;
   width: 100%;
-  height: 200px;
+  min-height: 100px;
   margin-bottom: 100px;
   display: flex;
   flex-wrap: wrap;
+
+  &.drag-files {
+   background: #555;
+   border-style: dashed;
+  }
 }
 
 .item-image{
@@ -123,4 +128,9 @@ body {
   object-fit: cover;
   background: #fff;
   cursor: grab;
+
+  &.drag-preview {
+    opacity: 0.4;
+    pointer-events: none;
+  }
 }
