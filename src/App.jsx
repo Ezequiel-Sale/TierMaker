@@ -11,6 +11,39 @@ function App() {
     const itemsSection = document.querySelector("#selector-items");
     const resetButton = document.querySelector("#reset-tier-button");
     const saveButton = document.querySelector("#save-tier-button");
+
+    function saveTierState() {
+      const tierRows = document.querySelectorAll('.tier .row');
+      const state = Array.from(tierRows).map(row => {
+        return Array.from(row.querySelectorAll('.item-image')).map(img => img.src);
+      });
+      const itemsSection = document.querySelector('#selector-items');
+      const itemsSectionState = Array.from(itemsSection.querySelectorAll('.item-image')).map(img => img.src);
+      
+      localStorage.setItem('tierState', JSON.stringify(state));
+      localStorage.setItem('itemsSectionState', JSON.stringify(itemsSectionState));
+    }
+    
+    function loadTierState() {
+      const state = JSON.parse(localStorage.getItem('tierState'));
+      const itemsSectionState = JSON.parse(localStorage.getItem('itemsSectionState'));
+      
+      if (state) {
+        const tierRows = document.querySelectorAll('.tier .row');
+        state.forEach((rowState, index) => {
+          rowState.forEach(imgSrc => {
+            const img = createItem(imgSrc);
+            tierRows[index].appendChild(img);
+          });
+        });
+      }
+      
+      if (itemsSectionState) {
+        itemsSectionState.forEach(imgSrc => {
+          createItem(imgSrc);
+        });
+      }
+    }
     const createItem = (src) => {
       const img = document.createElement("img");
       img.draggable = true;
@@ -58,6 +91,8 @@ function App() {
       }
       currentTarget.classList.remove("drag-over");
       currentTarget.querySelector(".drag-preview")?.remove();
+
+      saveTierState();
     };
 
     const handleDragOver = (e) => {
@@ -87,6 +122,7 @@ function App() {
       row.addEventListener("dragover", handleDragOver);
       row.addEventListener("dragleave", handleDragLeave);
     });
+    
 
     itemsSection.addEventListener("drop", handleDrop);
     itemsSection.addEventListener("dragover", handleDragOver);
@@ -130,6 +166,7 @@ function App() {
             // Si no existe una imagen con el mismo src, la creamos y agregamos
             if (!existingImage) {
               createItem(e.target.result);
+              saveTierState();
             }
           };
           reader.readAsDataURL(file);
@@ -156,6 +193,7 @@ function App() {
           item.remove();
           itemsSection.appendChild(item);
         });
+        saveTierState();
       });
     }
 
@@ -172,6 +210,8 @@ function App() {
         link.click();
       })
     })
+
+    loadTierState();
 
 
     return () => {
